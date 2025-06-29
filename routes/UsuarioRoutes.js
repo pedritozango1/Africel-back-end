@@ -31,4 +31,5 @@ router.get('/listar', (req, res) => {
 router.get('/EncontarID/:id', UsuarioController.encontrarUsuario);
 router.delete('/DeletarID/:id', UsuarioController.deletarUsuario);
 
+
 module.exports = router;

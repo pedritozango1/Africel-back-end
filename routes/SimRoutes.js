@@ -24,5 +24,8 @@ router.get('/usuario/:id_usuario', (req, res) => {
 router.delete('/deletar/:id', (req, res) => {
     SimController.deletarSim(req, res);
 });
+router.get('/validarNumero/:numero', (req, res) => {
+    SimController.validarNumero(req, res);
+});
 
 module.exports = router;

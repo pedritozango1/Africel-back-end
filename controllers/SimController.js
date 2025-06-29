@@ -50,6 +50,22 @@ class SimController {
             res.send({ message: 'SIM deletado com sucesso.' });
         });
     }
+    validarNumero(req, res) {
+        const numero = req.params.numero;
+
+        this.simModel.listar((err, result) => {
+            if (err) {
+                return res.status(500).send({ erro: "Erro ao consultar SIMs" });
+            }
+            const utilizador = result.find(el => el.numero === numero);
+
+            if (!utilizador)
+                res.send({ encontrado: false });
+            else
+                res.send({ encontrado: true });
+        });
+    }
+
 }
 
 module.exports = new SimController();
