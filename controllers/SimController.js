@@ -60,6 +60,7 @@ class SimController {
             const utilizador = result.find(el => el.numero === numero);
 
             if (!utilizador)
+                
                 res.send({ encontrado: false });
             else
                 res.send({ encontrado: true });
