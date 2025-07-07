@@ -1,6 +1,23 @@
 const db = require('../db/connect');
 
 class VerificacaoModel {
+    async gerarCodigoUnicoParaSim(id_sim) {
+        let codigo;
+        let existente = true;
+        while (existente) {
+            codigo = this.gerarCodigoVerificacao();
+            const [rows] = await db.promise().query(
+                `SELECT 1 FROM VERIFICACAO WHERE codigo_enviado = ? AND id_sim = ? AND validado = FALSE`,
+                [codigo, id_sim]
+            );
+            existente = rows.length > 0;
+        }
+
+        return codigo;
+    }
+    gerarCodigoVerificacao() {
+        return Math.floor(100000 + Math.random() * 900000).toString();
+    }
     criar(verificacao, callback) {
         const sql = `
             INSERT INTO VERIFICACAO (codigo_enviado, timestamp_envio, validado, id_sim)
@@ -21,9 +38,9 @@ class VerificacaoModel {
         const sql = 'SELECT * FROM VERIFICACAO WHERE id_verificacao = ?';
         db.query(sql, [id], callback);
     }
-    listarPorSim(id_sim, callback) {
-        const sql = 'SELECT * FROM VERIFICACAO WHERE id_sim = ?';
-        db.query(sql, [id_sim], callback);
+    listarPorSim(numero, callback) {
+        const sql = 'SELECT * FROM VERIFICACAO WHERE numero = ?';
+        db.query(sql, [numero], callback);
     }
     validarCodigo(id_verificacao, callback) {
         const sql = 'UPDATE VERIFICACAO SET validado = TRUE WHERE id_verificacao = ?';

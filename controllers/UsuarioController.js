@@ -1,40 +1,69 @@
 const UsuarioModel = require('../models/UsuarioModel');
+
 class UsuarioController {
-    usuarioModel = null;
     constructor() {
         this.usuarioModel = new UsuarioModel();
     }
-    criarUsuario(req, res) {
+    async criarUsuario(req) {
+        let form = req.body.form;
+
+        if (typeof form === 'string') {
+            try {
+                form = JSON.parse(form);
+            } catch (err) {
+                throw new Error("Formato inválido para form");
+            }
+        }
+
+        const frente = req.files?.frente?.[0];
+        const verso = req.files?.verso?.[0];
+        const selfie = req.files?.selfie?.[0];
+
         const usuario = {
-            nome_completo: req.body.nome_completo,
-            data_nascimento: req.body.data_nascimento,
-            genero: req.body.genero,
-            email: req.body.email,
-            telefone: req.body.telefone,
-            foto_webcam: imagem
+            nome_completo: form?.nome || null,
+            email: form?.email || null,
+            bi: form?.biNumber || null,
+            imagem_bi_frente: frente?.path || null,
+            imagem_bi_verso: verso?.path || null,
+            selfie: selfie?.path || null
         };
-        this.usuarioModel.criar(usuario, (err, result) => {
-            if (err) return res.status(500).send(err);
-            res.status(201).send({ message: 'Usuário criado com sucesso!', id: result.insertId });
+
+        console.log("Dados do usuário a ser inserido:", usuario);
+
+        return new Promise((resolve, reject) => {
+            this.usuarioModel.criar(usuario, (err, result) => {
+                if (err) return reject(err);
+                resolve(result.insertId);
+            });
         });
     }
 
-    listarUsuarios(req, res) {
+
+    async listarUsuarios(req, res) {
         this.usuarioModel.listar((err, results) => {
             if (err) return res.status(500).send(err);
             res.send(results);
         });
     }
 
-    deletarUsuario(req, res) {
+    async listarUsuarioUltimo() {
+        return new Promise((resolve, reject) => {
+            this.usuarioModel.listarUltimo((err, results) => {
+                if (err) reject(err);
+                else resolve(results[0]);
+            });
+        });
+    }
+
+    async deletarUsuario(req, res) {
         const id = req.params.id;
-        this.usuarioModel.deletar(id, (err, result) => {
+        this.usuarioModel.deletar(id, (err) => {
             if (err) return res.status(500).send(err);
             res.send({ message: 'Usuário deletado com sucesso.' });
         });
     }
 
-    encontrarUsuario(req, res) {
+    async encontrarUsuario(req, res) {
         const id = req.params.id;
         this.usuarioModel.encontrarPorId(id, (err, result) => {
             if (err) return res.status(500).send(err);

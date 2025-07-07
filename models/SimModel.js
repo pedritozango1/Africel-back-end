@@ -18,9 +18,9 @@ class SimModel {
         db.query(sql, callback);
     }
 
-    encontrarPorId(id, callback) {
-        const sql = 'SELECT * FROM SIM WHERE id_sim = ?';
-        db.query(sql, [id], callback);
+    encontrarPorNumero(numero, callback) {
+        const sql = 'SELECT * FROM SIM WHERE numero = ?';
+        db.query(sql, [numero], callback);
     }
 
     listarPorUsuario(id_usuario, callback) {

@@ -2,11 +2,14 @@ const express = require('express');
 const router = express.Router();
 const VerificacaoController = require('../controllers/VerificacaoController');
 
+
 router.post('/registar', (req, res) => {
     VerificacaoController.criarVerificacao(req, res);
 });
 
-
+router.get('/rastrear', (req, res) => {
+    console.log("Estou bm dentro shcsdk dsjsfh fodihds pakddlskklsa");
+});
 router.get('/listar', (req, res) => {
     VerificacaoController.listarVerificacoes(req, res);
 });

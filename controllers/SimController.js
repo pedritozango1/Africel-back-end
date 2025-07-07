@@ -5,17 +5,29 @@ class SimController {
         this.simModel = new SimModel();
     }
 
-    criarSim(req, res) {
+    async criarSim(req) {
+        let form = req.body.form;
+        if (typeof form === 'string') {
+            try {
+                form = JSON.parse(form);
+            } catch (err) {
+                throw new Error("Formato inválido para form");
+            }
+        }
+
         const sim = {
-            numero: req.body.numero,
-            data_registo: req.body.data_registo,
+            numero: form.phone,
+            data_registo: new Date().toISOString().split("T")[0],
             id_usuario: req.body.id_usuario
         };
+        return new Promise((resolve, reject) => {
+            this.simModel.criar(sim, (err, result) => {
+                if (err) reject(err);
+                else
+                    resolve(result)
+            });
+        })
 
-        this.simModel.criar(sim, (err, result) => {
-            if (err) return res.status(500).send(err);
-            res.status(201).send({ message: 'SIM criado com sucesso!', id: result.insertId });
-        });
     }
 
     listarSim(req, res) {
@@ -24,7 +36,15 @@ class SimController {
             res.send(results);
         });
     }
+    async listarSimPornumero(numero, res) {
+        return new Promise((resolve, reject) => {
+            this.simModel.encontrarPorNumero(numero, (err, results) => {
+                if (err) reject(err);
+                resolve(results[0]);
+            });
+        })
 
+    }
 
     encontrarSim(req, res) {
         const id = req.params.id;
@@ -60,7 +80,7 @@ class SimController {
             const utilizador = result.find(el => el.numero === numero);
 
             if (!utilizador)
-                
+
                 res.send({ encontrado: false });
             else
                 res.send({ encontrado: true });
