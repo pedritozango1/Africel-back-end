@@ -19,42 +19,27 @@ const storage = multer.diskStorage({
      }
 });
 const upload = multer({ storage });
-async function compararRostos(caminhoImagem1, caminhoImagem2) {
-     const form = new FormData();
-     form.append('image1', fs.createReadStream(caminhoImagem1));
-     form.append('image2', fs.createReadStream(caminhoImagem2));
-
-     try {
-          const resposta = await axios.post('http://127.0.0.1:5000/compare', form, {
-               headers: form.getHeaders()
-          });
-          return resposta.data; // JSON com resultado da comparação
-     } catch (error) {
-          console.error("Erro ao chamar API Python:", error.message);
-          throw error;
-     }
-}
+// 📌 Função
 async function criarDocumento(req, res) {
      try {
-          const frente = req.files?.frente?.[0];
-          const selfie = req.files?.selfie?.[0];
-          const verso = req.files?.verso?.[0];
+          const frente = req.files?.fileDocCropped?.[0];
+          const selfie = req.files?.fileSelfieCropped?.[0];
+          const rosto = req.files?.fileFaceCropped?.[0];
 
-          if (!frente || !selfie || !verso) {
-               return res.status(400).json({ erro: "Faltam imagens frente, selfie ou verso" });
+          if (!frente || !selfie || !rosto) {
+               return res.status(400).json({ erro: "Faltam imagens: documento, selfie ou rosto" });
           }
 
           const caminhoFrente = path.resolve(frente.path);
           const caminhoSelfie = path.resolve(selfie.path);
+          const caminhoRosto = path.resolve(rosto.path);
 
           await UsuarioController.criarUsuario(req);
           const ultimoUsuario = await UsuarioController.listarUsuarioUltimo();
           req.body.id_usuario = ultimoUsuario.id_usuario;
           await SimController.criarSim(req);
-          const smsverif = await VerificacaoController.criarVerificacao(req);
           return res.status(200).json({
                mensagem: "Documento recebido com sucesso!",
-               smsverif
           });
 
      } catch (err) {
@@ -63,13 +48,13 @@ async function criarDocumento(req, res) {
      }
 }
 
-// 📌 Rotas
+// 📌 Rota atualizada
 router.post(
      '/registarNovo',
      upload.fields([
-          { name: 'frente', maxCount: 1 },
-          { name: 'selfie', maxCount: 1 },
-          { name: 'verso', maxCount: 1 },
+          { name: 'fileDocCropped', maxCount: 1 },
+          { name: 'fileSelfieCropped', maxCount: 1 },
+          { name: 'fileFaceCropped', maxCount: 1 }
      ]),
      (req, res) => {
           criarDocumento(req, res);

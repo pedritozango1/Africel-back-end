@@ -16,20 +16,18 @@ class SimController {
         }
 
         const sim = {
-            numero: form.phone,
+            numero: form.telefone,
             data_registo: new Date().toISOString().split("T")[0],
             id_usuario: req.body.id_usuario
         };
+
         return new Promise((resolve, reject) => {
             this.simModel.criar(sim, (err, result) => {
                 if (err) reject(err);
-                else
-                    resolve(result)
+                else resolve(result);
             });
-        })
-
+        });
     }
-
     listarSim(req, res) {
         this.simModel.listar((err, results) => {
             if (err) return res.status(500).send(err);

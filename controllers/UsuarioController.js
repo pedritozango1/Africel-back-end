@@ -15,16 +15,16 @@ class UsuarioController {
             }
         }
 
-        const frente = req.files?.frente?.[0];
-        const verso = req.files?.verso?.[0];
-        const selfie = req.files?.selfie?.[0];
+        const frente = req.files?.fileDocCropped?.[0];
+        const rosto = req.files?.fileFaceCropped?.[0];
+        const selfie = req.files?.fileSelfieCropped?.[0];
 
         const usuario = {
             nome_completo: form?.nome || null,
             email: form?.email || null,
             bi: form?.biNumber || null,
             imagem_bi_frente: frente?.path || null,
-            imagem_bi_verso: verso?.path || null,
+            imagem_bi_verso: rosto?.path || null,
             selfie: selfie?.path || null
         };
 
@@ -37,8 +37,6 @@ class UsuarioController {
             });
         });
     }
-
-
     async listarUsuarios(req, res) {
         this.usuarioModel.listar((err, results) => {
             if (err) return res.status(500).send(err);
